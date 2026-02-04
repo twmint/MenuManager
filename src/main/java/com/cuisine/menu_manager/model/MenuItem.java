@@ -7,13 +7,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MenuItem {
     @Id
     private String id;
+    private String userId;
     private String name;
     private String description;
     private double price;
     private String category;
     private String imageUrl;
 
-    public MenuItem(String name, String description, double price, String category, String imageUrl) {
+    public MenuItem(String userId, String name, String description, double price, String category, String imageUrl) {
+        this.userId = userId;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -27,6 +29,14 @@ public class MenuItem {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getName() {

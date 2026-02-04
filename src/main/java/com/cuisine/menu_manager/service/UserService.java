@@ -2,6 +2,7 @@ package com.cuisine.menu_manager.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.cuisine.menu_manager.model.User;
@@ -10,13 +11,16 @@ import com.cuisine.menu_manager.repository.UserRepository;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User register(String username, String password) {
         User user = new User(username, password);
+        user.setPassword(passwordEncoder.encode(password));
         return userRepository.save(user);
     }
 
@@ -42,7 +46,7 @@ public class UserService {
             return null;
         }
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         return userRepository.save(user);
     }
 

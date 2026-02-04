@@ -2,6 +2,10 @@ package com.cuisine.menu_manager.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,15 +24,16 @@ public class MenuItemService {
         this.mongoTemplate = mongoTemplate;
     }
 
-    public List<MenuItem> getAllMenuItems() {
-        return menuItemRepository.findAll();
+    public Page<MenuItem> getAllMenuItems(String userId, int page, int size ) {
+        return menuItemRepository.findByUserId(userId, PageRequest.of(page - 1, size));
     }
 
     public MenuItem getMenuItemById(String id) {
         return menuItemRepository.findById(id).orElse(null);
     }
 
-    public MenuItem createMenuItem(MenuItem menuItem) {
+    public MenuItem createMenuItem(String userId, MenuItem menuItem) {
+        menuItem.setUserId(userId);
         return menuItemRepository.save(menuItem);
     }
 
@@ -49,8 +54,14 @@ public class MenuItemService {
         menuItemRepository.deleteById(id);
     }
 
-    public List<MenuItem> searchMenuItems(String keyword, String category, Double minPrice, Double maxPrice) {
+    public Page<MenuItem> searchMenuItems(String userId, String keyword, String category, Double minPrice, Double maxPrice, int page, int size) {
         Query query = new Query();
+
+        if (userId != null) {
+            query.addCriteria(Criteria.where("userId").is(userId));
+        } else {
+            return new PageImpl<>(List.of());
+        }
 
         if (keyword != null) {
             query.addCriteria(Criteria.where("name").regex(keyword, "i"));
@@ -65,7 +76,11 @@ public class MenuItemService {
         } else if (maxPrice != null) {
             query.addCriteria(Criteria.where("price").lte(maxPrice));
         }
-
-        return mongoTemplate.find(query, MenuItem.class);
+        
+        Pageable pageable = PageRequest.of(page - 1, size);   
+        query.with(pageable);
+        List<MenuItem> items = mongoTemplate.find(query, MenuItem.class);
+        long count = mongoTemplate.count(Query.of(query).limit(-1).skip(-1), MenuItem.class);
+        return new PageImpl<>(items, pageable, count);
     }
 }
