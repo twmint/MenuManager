@@ -1,13 +1,40 @@
-Menu Manager
-A simple REST API for managing food menus. This backend handles user authentication and allows users to create menu entries with descriptions and images.
+# Menu Manager
 
-Features
-User Authentication: Register and login functionality.
-Menu Management: Create menu items with a title/description.
-Image Uploads: Support for uploading food photos associated with menu items.
+Backend REST API for managing restaurant menus. Handles user authentication, menu items with search, and image uploads.
 
-Tech Stack
-Language: Java
-Framework: Spring Boot
-Database: MongoDB Atlas
-Storage: Local for images
+## Features
+
+- User registration and login (JWT)
+- Password reset by email
+- Menu item CRUD with search and pagination
+- Image upload for menu items
+
+## Stack
+
+- Java 17
+- Spring Boot
+- MongoDB
+- Maven
+
+## Getting Started
+
+### Prerequisites
+
+- JDK 17+
+- MongoDB instance (Atlas or local)
+
+### Configuration
+
+Set the following in `src/main/resources/application.properties`:
+
+- `spring.mongodb.uri`: MongoDB connection string
+- `jwt.secret`: secret for signing JWTs
+- `spring.mail.*`: SMTP settings for password reset emails
+- `app.base-url`: public URL of this API
+- `app.fe-base-url`: frontend URL, used in reset links
+
+### Run
+
+```bash
+./mvnw spring-boot:run
+```
